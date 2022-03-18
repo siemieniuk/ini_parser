@@ -1,2 +1,2 @@
 # ini_parser
-Program to parse INI files written in pure C
+A program which parses INI files
