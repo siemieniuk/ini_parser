@@ -4,11 +4,11 @@
 #include <stdbool.h>
 #include "utility.h"
 
-short check_legal_char(char ch)
+bool check_legal_char(char ch)
 {
 	if (isalnum(ch) || ch == '-')
-		return 1;
-	return 0;
+		return true;
+	return false;
 }
 
 enum Line_type classify_line(char line[])

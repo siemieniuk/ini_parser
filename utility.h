@@ -1,5 +1,7 @@
 #ifndef _UTILITY_H
 #define _UTILITY_H
+#include <stdbool.h>
+
 enum Line_type { COMMENT, SECTION, ENTRY, EMPTY, ERROR };
 
 struct Entry
@@ -14,7 +16,7 @@ struct Section
 	struct Entry* entries;
 };
 
-short check_legal_char(char ch);
+bool check_legal_char(char ch);
 enum Line_type classify_line(char line[]);
 char* read_line(FILE* fp);
 int get_length(char str[]);
