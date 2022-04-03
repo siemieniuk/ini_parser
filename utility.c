@@ -1,14 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <ctype.h>
 #include <stdbool.h>
 #include "utility.h"
 
-bool check_legal_char(char ch)
+inline bool check_legal_char(char ch)
 {
 	if (isalnum(ch) || ch == '-')
 		return true;
 	return false;
+}
+
+bool is_valid_ini_name(char s[]) {
+	const short LEN = strlen(s);
+	for (short i=0; i<LEN; i++) {
+		if (!(check_legal_char(s[i]))) {
+			return false;
+		}
+	}
+	return true;
 }
 
 enum Line_type classify_line(char line[])
@@ -119,9 +130,24 @@ struct Section* create_section(char line[])
 }
 
 // TODO: finish parse_ini_file (parse_ini_file is not yet functional)
-void parse_ini_file(char path[])
+void parse_ini_file(int argc, char* argv[])
 {
+	char* path = argv[1];
 	FILE* fp = fopen(path, "r");
+	if (!fp) {
+        fprintf(stderr, "File %s not found", path);
+        exit(1);
+    }
+
+	// Check if there is "expression" case
+	char** operations;
+	char** entries_to_find;
+	if (argv[2] == "expression") {
+		// TODO: process expressions
+	} else {
+		entries_to_find = (char** )malloc(sizeof(char*));
+		entries_to_find[0] = argv[2];
+	}
 
 	char* line;
 	struct Section* sect;
@@ -142,6 +168,7 @@ void parse_ini_file(char path[])
 		free(line);
 	}
 
+	free(entries_to_find);
 	fclose(fp);
 	return;
 }
