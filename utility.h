@@ -1,3 +1,5 @@
+#ifndef _UTILITY_H
+#define _UTILITY_H
 enum Line_type { COMMENT, SECTION, ENTRY, EMPTY, ERROR };
 
 struct Entry
@@ -20,3 +22,4 @@ struct Section* create_section(char line[]);
 
 // TODO: finish parse_ini_file (parse_ini_file is not yet functional)
 void parse_ini_file(char path[]);
+#endif
