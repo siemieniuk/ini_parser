@@ -95,12 +95,10 @@ int get_length(char str[])
 }
 
 
-struct Section* create_section(char line[])
+struct Section create_section(char line[])
 {
 	int len = get_length(line);
 	char* name = (char*)malloc(sizeof(char) * (len - 1));
-	if (!name)
-		return NULL;
 
 	int line_ind = 1, name_ind = 0;
 	while (line_ind <= len - 2)
@@ -111,12 +109,10 @@ struct Section* create_section(char line[])
 	}
 	name[name_ind] = '\0';
 
-	struct Section* sect = (struct Section*)malloc(sizeof(struct Section));
-	if (!sect)
-		return sect;
-	sect->name = name;
-	sect->size = 0;
-	sect->entries = NULL;
+	struct Section sect;	
+	sect.name = name;
+	sect.size = 0;
+	sect.entries = NULL;
 	return sect;
 }
 
@@ -132,12 +128,12 @@ void add_entry_to_sect(struct Section* sect, char line[])
 	}
 
 
-	char* key = (char*)malloc(sizeof(char) * (eq_ind + 1));
-	char * val = (char*)malloc(sizeof(char) * (len - eq_ind));
+	char* key = (char*)malloc(sizeof(char) * (eq_ind));
+	char * val = (char*)malloc(sizeof(char) * (len - eq_ind-1));
 	
 	// Copying part of line into key
 	int curr_ind = 0;
-	for(; curr_ind < eq_ind; curr_ind++)
+	for(; curr_ind < eq_ind-1; curr_ind++)
 	{
 		key[curr_ind] = line[curr_ind];
 	}
@@ -145,7 +141,7 @@ void add_entry_to_sect(struct Section* sect, char line[])
 	
 	// Copyting part of line into val
 	curr_ind = 0;
-	int i = eq_ind + 1;
+	int i = eq_ind + 2;
 	for(; i < len; i++)
 	{
 		val[curr_ind] = line[i];
@@ -155,38 +151,51 @@ void add_entry_to_sect(struct Section* sect, char line[])
 
 	// Appending new entry to the entries in sect
 	sect->size += 1;
-	struct Entry* temp = (struct Entry*)realloc(sect->entries, sizeof(struct Entry) * (sect->size));
-	sect->entries = temp;
+	sect->entries = (struct Entry*)realloc(sect->entries, sizeof(struct Entry) * (sect->size));
+
 	struct Entry new_entry;
 	new_entry.key = key;
 	new_entry.value = val;
 	sect->entries[sect->size - 1] = new_entry;
 }
 
-// TODO: finish parse_ini_file (parse_ini_file is not yet functional)
-void parse_ini_file(char path[])
+struct Content parse_ini_file(char path[])
 {
 	FILE* fp = fopen(path, "r");
 
-	char* line;
-	struct Section* sect;
-	struct Entry* entry;
+	struct Section* sects = NULL;
+	int num_sects = 0;
 	while (!feof(fp))
 	{
+		char* line = NULL;
 		line = read_line(fp);
 
 		enum Line_type line_t = classify_line(line);
 
 		if (line_t == SECTION)
 		{
-			sect = create_section(line);
-			printf(sect->name);
+			num_sects++;
+			sects = realloc(sects, sizeof(struct Section) * num_sects);
+			sects[num_sects - 1] = create_section(line);
+			
 		}
-		// TODO for other line_types
+		else if (line_t == ENTRY)
+		{
+			add_entry_to_sect(&sects[num_sects - 1], line);
+		}
+		else if (line_t == ERROR)
+		{
+			printf("Bad line in file\n");
+			fclose(fp);
+			break;
+		}
 
 		free(line);
 	}
 
 	fclose(fp);
-	return;
+	struct Content content;
+	content.sects = sects;
+	content.num_sects = num_sects;
+	return content;
 }
