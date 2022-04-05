@@ -14,6 +14,7 @@ struct Section
 {
 	char* name;
 	struct Entry* entries;
+	int size;
 };
 
 bool check_legal_char(char ch);
@@ -21,6 +22,7 @@ enum Line_type classify_line(char line[]);
 char* read_line(FILE* fp);
 int get_length(char str[]);
 struct Section* create_section(char line[]);
+void add_entry_to_sect(struct Section* sect, char line[]);
 
 // TODO: finish parse_ini_file (parse_ini_file is not yet functional)
 void parse_ini_file(char path[]);

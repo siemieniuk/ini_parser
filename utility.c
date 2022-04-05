@@ -115,7 +115,52 @@ struct Section* create_section(char line[])
 	if (!sect)
 		return sect;
 	sect->name = name;
+	sect->size = 0;
+	sect->entries = NULL;
 	return sect;
+}
+
+void add_entry_to_sect(struct Section* sect, char line[])
+{
+	// Finding position of '=' in line
+	int len = get_length(line);
+	int eq_ind = 0;
+	for(eq_ind = 0; eq_ind < len; eq_ind++)
+	{
+		if (line[eq_ind] == '=')
+			break;
+	}
+
+
+	char* key = (char*)malloc(sizeof(char) * (eq_ind + 1));
+	char * val = (char*)malloc(sizeof(char) * (len - eq_ind));
+	
+	// Copying part of line into key
+	int curr_ind = 0;
+	for(; curr_ind < eq_ind; curr_ind++)
+	{
+		key[curr_ind] = line[curr_ind];
+	}
+	key[curr_ind] = '\0';
+	
+	// Copyting part of line into val
+	curr_ind = 0;
+	int i = eq_ind + 1;
+	for(; i < len; i++)
+	{
+		val[curr_ind] = line[i];
+		curr_ind++;
+	}
+	val[curr_ind] = '\0';
+
+	// Appending new entry to the entries in sect
+	sect->size += 1;
+	struct Entry* temp = (struct Entry*)realloc(sect->entries, sizeof(struct Entry) * (sect->size));
+	sect->entries = temp;
+	struct Entry new_entry;
+	new_entry.key = key;
+	new_entry.value = val;
+	sect->entries[sect->size - 1] = new_entry;
 }
 
 // TODO: finish parse_ini_file (parse_ini_file is not yet functional)
