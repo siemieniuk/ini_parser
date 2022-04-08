@@ -58,6 +58,7 @@ enum Line_type classify_line(char line[])
 	return ENTRY;
 }
 
+// Accepts file pointer and returns pointer to the read string
 char* read_line(FILE* fp)
 {
 	int size = 30;
