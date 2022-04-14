@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <stdbool.h>
+#include <string.h>
 #include "utility.h"
 
 bool check_legal_char(char ch)
@@ -176,7 +177,7 @@ struct Content parse_ini_file(char path[])
 		if (line_t == SECTION)
 		{
 			num_sects++;
-			sects = realloc(sects, sizeof(struct Section) * num_sects);
+			sects = (struct Section*)realloc(sects, sizeof(struct Section) * num_sects);
 			sects[num_sects - 1] = create_section(line);
 			
 		}
@@ -199,4 +200,153 @@ struct Content parse_ini_file(char path[])
 	content.sects = sects;
 	content.num_sects = num_sects;
 	return content;
+}
+
+int find_dot(char ident[])
+{
+	int i = 0;
+	while(ident[i] != '.' && ident[i] != '\0')
+	{
+		i++;
+	}
+	
+	if(ident[i] == '\0')
+		return -1;
+	return i;
+}
+
+char* get_value(struct Content* cont, char ident[])
+{
+	int num_sects = cont->num_sects;
+	int dot_ind = find_dot(ident);
+	int ident_len = get_length(ident);
+	bool correct_sect = false;
+
+
+	int sect_ind = -1;
+	char* sect_name = NULL;
+	for(int i = 0; i < num_sects; i++)
+	{
+		sect_name = cont->sects[i].name;
+		if(get_length(sect_name) != dot_ind)
+			continue;
+		
+		correct_sect = true;
+		for(int j = 0; j < dot_ind; j++)
+		{
+			if(ident[j] != sect_name[j])
+			{
+				correct_sect = false;
+				break;
+			}
+		}
+
+		if(correct_sect)
+		{
+			sect_ind = i;
+			break;
+		}
+	}
+	if(!correct_sect)
+	{
+		printf("Failed to find section [%s]\n", sect_name);
+		return NULL;
+	}
+
+
+	int num_entries = cont->sects[sect_ind].size;
+	bool correct_key = false;
+	int entry_ind = -1;
+	char* key = NULL;
+	for(int i = 0; i < num_entries; i++)
+	{
+		key = cont->sects[sect_ind].entries[i].key;
+		if(get_length(key) != (ident_len - dot_ind - 1))
+			continue;
+
+		correct_key = true;
+		for(int j = dot_ind + 1; j < ident_len; j++)
+		{
+			if(ident[j] != key[j - dot_ind - 1])
+			{
+				correct_key = false;
+				break;
+			}
+		}
+
+		if(correct_key)
+		{
+			entry_ind = i;
+			break;
+		}
+	}
+	if(!correct_key)
+	{
+		printf("Failed to find key \"%s\" in section [%s]\n", key, sect_name);
+		return NULL;
+	}
+
+
+	char* value = cont->sects[sect_ind].entries[entry_ind].value;
+	return value;
+
+}
+
+bool is_number(char s[])
+{
+	int len = get_length(s);
+	if (len < 1)
+		return false;
+
+	if (len == 1)
+		return isdigit(s[0]);
+	
+	for(int i = 0; i < len; i++)
+	{
+		if(i == 0 && s[i] == '-')
+			continue;
+		
+		if(!isdigit(s[i]))
+			return false;
+	}
+	return true;
+}
+
+int str_to_int(char s[])
+{
+	int len = get_length(s);
+	int i = 0;
+	bool negative = false;
+	if(s[0] == '-')
+	{
+		negative = true;
+		i = 1;
+	}
+	
+	int num = 0;
+	for(; i < len; i++)
+	{
+		int digit = s[i] - '0';
+		num = 10 * num + digit;
+	}
+	
+	if(negative)
+		num *= -1;
+
+	return num;
+}
+
+bool check_equal_str(char s1[], char s2[])
+{
+	int len1 = get_length(s1);
+	int len2 = get_length(s2);
+	if (len1 != len2)
+		return false;
+	
+	for(int i = 0; i < len1; i++)
+	{
+		if(s1[i] != s2[i])
+			return false;
+	}
+	return true;
 }

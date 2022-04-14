@@ -31,4 +31,10 @@ struct Section create_section(char line[]);
 void add_entry_to_sect(struct Section* sect, char line[]);
 
 struct Content parse_ini_file(char path[]);
+
+int find_dot(char ident[]);
+char* get_value(struct Content* cont, char ident[]);
+bool is_number(char s[]);
+int str_to_int(char s[]);
+bool check_equal_str(char s1[], char s2[]);
 #endif
