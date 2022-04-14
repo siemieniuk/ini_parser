@@ -202,6 +202,7 @@ struct Content parse_ini_file(char path[])
 	return content;
 }
 
+// Return index of first dot in string
 int find_dot(char ident[])
 {
 	int i = 0;
@@ -215,6 +216,7 @@ int find_dot(char ident[])
 	return i;
 }
 
+// Return the value for the given "section.key" in given Content
 char* get_value(struct Content* cont, char ident[])
 {
 	int num_sects = cont->num_sects;
@@ -292,6 +294,7 @@ char* get_value(struct Content* cont, char ident[])
 
 }
 
+// Return "true" if string represents integer, "false" otherwise
 bool is_number(char s[])
 {
 	int len = get_length(s);
@@ -312,6 +315,7 @@ bool is_number(char s[])
 	return true;
 }
 
+// Converts string to int and returns the int value
 int str_to_int(char s[])
 {
 	int len = get_length(s);
@@ -336,6 +340,7 @@ int str_to_int(char s[])
 	return num;
 }
 
+// Return "true" if two given strings are equal, "false" otherwise
 bool check_equal_str(char s1[], char s2[])
 {
 	int len1 = get_length(s1);
@@ -349,4 +354,58 @@ bool check_equal_str(char s1[], char s2[])
 			return false;
 	}
 	return true;
+}
+
+// Returns pointer to new string, which is a substring [start, end) of given
+char* get_substring(char s[], int start, int end)
+{
+	int res_len = end - start;
+	char* res = (char*)malloc(sizeof(char) * (res_len + 1));
+	
+	for(int i = 0; i < res_len; i++)
+	{
+		res[i] = s[start + i];
+	}
+	res[res_len] = '\0';
+	
+	return res;
+}
+
+void run_expression(struct Content* cont, char expr[])
+{
+	int len = get_length(expr);
+	char oper = '\0';
+	int oper_ind = -1;
+	for(int i = 0; i < len; i++)
+	{
+		if(expr[i] == ' ')
+		{
+			oper = expr[i + 1];
+			oper_ind = i + 1;
+			break;
+		}
+	}
+	if(oper_ind == -1)
+	{
+		printf("Invalid expression\n");
+		return;
+	}
+
+	char* ident1 = get_substring(expr, 0, oper_ind-1);
+	char* ident2 = get_substring(expr, oper_ind + 2, len);
+
+	char* val1 = get_value(cont, ident1);
+	char* val2 = get_value(cont, ident2);
+
+	free(ident1);
+	free(ident2);
+
+	if(val1 == NULL || val2 == NULL)
+		return;
+	
+	bool first_int = is_number(val1);
+	bool second_int = is_number(val2);
+	
+		
+
 }

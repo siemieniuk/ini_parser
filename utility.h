@@ -37,4 +37,6 @@ char* get_value(struct Content* cont, char ident[]);
 bool is_number(char s[]);
 int str_to_int(char s[]);
 bool check_equal_str(char s1[], char s2[]);
+
+void run_expression(struct Content* cont, char expr[]);
 #endif

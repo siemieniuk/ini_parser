@@ -16,7 +16,7 @@ int main1(int argc, char *argv[])
 
     if(check_equal_str(argv[2], "expression"))
     {
-        printf("NOT IMPLEMENTED YET\n");
+        run_expression(&cont, argv[3]);
     }
     else
     {
