@@ -5,6 +5,7 @@
 #include <string.h>
 #include "utility.h"
 
+// Returns "true" if given char is legal
 bool check_legal_char(char ch)
 {
 	if (isalnum(ch) || ch == '-')
@@ -12,6 +13,7 @@ bool check_legal_char(char ch)
 	return false;
 }
 
+// Returns Line_type of given line
 enum Line_type classify_line(char line[])
 {
 	// If nothing in line, then it is empty
@@ -60,6 +62,7 @@ enum Line_type classify_line(char line[])
 }
 
 // Accepts file pointer and returns pointer to the read string
+// ALLOCATES MEMORY
 char* read_line(FILE* fp)
 {
 	int size = 30;
@@ -96,7 +99,8 @@ int get_length(char str[])
 	return i;
 }
 
-
+// Returns an empty section with the name, extraxcted from given line
+// ALLOCATES MEMORY
 struct Section create_section(char line[])
 {
 	int len = get_length(line);
@@ -118,6 +122,8 @@ struct Section create_section(char line[])
 	return sect;
 }
 
+// Returns add an entry to the given sect from given line
+// ALLOCATES MEMORY
 void add_entry_to_sect(struct Section* sect, char line[])
 {
 	// Finding position of '=' in line
@@ -161,6 +167,7 @@ void add_entry_to_sect(struct Section* sect, char line[])
 	sect->entries[sect->size - 1] = new_entry;
 }
 
+// Returns the total Content, extracted from the given file
 struct Content parse_ini_file(char path[])
 {
 	FILE* fp = fopen(path, "r");
@@ -188,7 +195,14 @@ struct Content parse_ini_file(char path[])
 		else if (line_t == ERROR)
 		{
 			printf("Bad line in file\n");
-			fclose(fp);
+			free(line);
+
+			struct Content content;
+			content.sects = sects;
+			content.num_sects = num_sects;
+			clear_content(&content);
+
+			exit(1);
 			break;
 		}
 
@@ -221,6 +235,11 @@ char* get_value(struct Content* cont, char ident[])
 {
 	int num_sects = cont->num_sects;
 	int dot_ind = find_dot(ident);
+	if(dot_ind == -1)
+	{
+		printf("Incorrect argument \"%s\"", ident);
+		exit(1);
+	}
 	int ident_len = get_length(ident);
 	bool correct_sect = false;
 
@@ -251,7 +270,7 @@ char* get_value(struct Content* cont, char ident[])
 	}
 	if(!correct_sect)
 	{
-		printf("Failed to find section [%s]\n", sect_name);
+		printf("Failed to find the section in %s\n", ident);
 		return NULL;
 	}
 
@@ -284,7 +303,7 @@ char* get_value(struct Content* cont, char ident[])
 	}
 	if(!correct_key)
 	{
-		printf("Failed to find key \"%s\" in section [%s]\n", key, sect_name);
+		printf("Failed to find the key in given section in \"%s\"\n", ident);
 		return NULL;
 	}
 
@@ -357,6 +376,7 @@ bool check_equal_str(char s1[], char s2[])
 }
 
 // Returns pointer to new string, which is a substring [start, end) of given
+// ALLOCATES MEMORY
 char* get_substring(char s[], int start, int end)
 {
 	int res_len = end - start;
@@ -406,6 +426,62 @@ void run_expression(struct Content* cont, char expr[])
 	bool first_int = is_number(val1);
 	bool second_int = is_number(val2);
 	
-		
+	if(first_int != second_int)
+	{
+		printf("Operands of different type. \"%s\" is invalid\n", expr);
+		return;
+	}
 
+	if(first_int)
+	{
+		int num1 = str_to_int(val1);
+		int num2 = str_to_int(val2);
+		int res;
+		switch(oper)
+		{
+		case '+':
+			res = num1 + num2;
+			break;
+		case '-':
+			res = num1 - num2;
+			break;
+		case '*':
+			res = num1 * num2;
+			break;
+		case '/':
+			res = num1 / num2;
+			break;
+		default:
+			printf("Unknown operator '%c'\n", oper);
+			return;
+			break;
+		}
+		printf("%d\n", res);
+	}
+	else
+	{
+		if(oper != '+')
+		{
+			printf("Invalid or unknown operator '%c' for strings\n", oper);
+		}
+
+		printf("%s%s\n", val1, val2);
+	}
+}
+
+void clear_content(struct Content* cont)
+{
+	int num_sects = cont->num_sects;
+	for(int i = 0; i < num_sects; i++)
+	{
+		int num_entries = cont->sects[i].size;
+		for(int j = 0; j < num_entries; j++)
+		{
+			free(cont->sects[i].entries[j].key);
+			free(cont->sects[i].entries[j].value);
+		}
+		free(cont->sects[i].name);
+		free(cont->sects[i].entries);
+	}
+	free(cont->sects);
 }
