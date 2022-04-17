@@ -381,18 +381,21 @@ void run_expression(struct Content* cont, char expr[])
 	const int expr_len = strlen(expr);
 	char oper = '\0';
 	int oper_ind = -1;
+	int whitespace_ctr = 0;
 	for (int i = 0; i < expr_len; i++)
 	{
 		if (expr[i] == ' ')
 		{
-			oper = expr[i + 1];
-			oper_ind = i + 1;
-			break;
+			if (oper_ind == -1) {
+				oper = expr[i + 1];
+				oper_ind = i + 1;
+			}
+			whitespace_ctr++;
 		}
 	}
-	if (oper_ind == -1)
+	if (oper_ind == -1 || whitespace_ctr != 2 || expr[oper_ind+1] != ' ')
 	{
-		printf("Invalid expression\n");
+		printf("Invalid expression: \"%s\"\n", expr);
 		return;
 	}
 
