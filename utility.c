@@ -190,7 +190,7 @@ struct Content parse_ini_file(char path[])
 		}
 		else if (line_t == ERROR)
 		{
-			printf("Bad line in file\n");
+			printf("Incorrect identifier in file\n");
 			free(line);
 
 			struct Content content;
@@ -254,14 +254,13 @@ char* get_key_name(char ident[]) {
 // Return the value for the given "section.key" in given Content
 char* get_value(struct Content* cont, char ident[])
 {
-	printf("%s\n", ident);
-	const int num_sects = cont->num_sects;
-	int dot_ind = find_dot(ident);
+	const int dot_ind = find_dot(ident);
 	if (dot_ind == -1)
 	{
-		printf("Incorrect argument \"%s\"", ident);
-		exit(1);
+		printf("Incorrect identifier \"%s\"", ident);
+		return NULL;
 	}
+	const int num_sects = cont->num_sects;
 	const int ident_len = strlen(ident);
 	bool is_section_correct = false;
 
@@ -383,16 +382,16 @@ void run_expression(struct Content* cont, char expr[])
 	int len = strlen(expr);
 	char oper = '\0';
 	int oper_ind = -1;
-	for(int i = 0; i < len; i++)
+	for (int i = 0; i < len; i++)
 	{
-		if(expr[i] == ' ')
+		if (expr[i] == ' ')
 		{
 			oper = expr[i + 1];
 			oper_ind = i + 1;
 			break;
 		}
 	}
-	if(oper_ind == -1)
+	if (oper_ind == -1)
 	{
 		printf("Invalid expression\n");
 		return;
@@ -450,6 +449,7 @@ void run_expression(struct Content* cont, char expr[])
 		if (oper != '+')
 		{
 			printf("Invalid or unknown operator '%c' for strings\n", oper);
+			return;
 		}
 
 		printf("%s%s\n", val1, val2);
