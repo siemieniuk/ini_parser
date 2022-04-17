@@ -256,7 +256,7 @@ char* get_value(struct Content* cont, char ident[])
 	const int dot_ind = find_dot(ident);
 	if (dot_ind == -1)
 	{
-		printf("Incorrect identifier \"%s\"", ident);
+		printf("Incorrect identifier \"%s\"\n", ident);
 		return NULL;
 	}
 	const int num_sects = cont->num_sects;
@@ -390,7 +390,7 @@ void run_expression(struct Content* cont, char expr[])
 			break;
 		}
 	}
-	if (oper_ind == -1)
+	if (oper_ind == -1 || (expr[oper_ind+1] != ' '))
 	{
 		printf("Invalid expression\n");
 		return;
