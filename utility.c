@@ -91,19 +91,11 @@ char* read_line(FILE* fp)
 	return (char*)realloc(line, sizeof(char) * len);
 }
 
-int get_length(char str[])
-{
-	int i = 0;
-	while (str[i] != '\0')
-		i++;
-	return i;
-}
-
 // Returns an empty section with the name, extraxcted from given line
 // ALLOCATES MEMORY
 struct Section create_section(char line[])
 {
-	int len = get_length(line);
+	int len = strlen(line);
 	char* name = (char*)malloc(sizeof(char) * (len - 1));
 
 	int line_ind = 1, name_ind = 0;
@@ -127,7 +119,7 @@ struct Section create_section(char line[])
 void add_entry_to_sect(struct Section* sect, char line[])
 {
 	// Finding position of '=' in line
-	int len = get_length(line);
+	int len = strlen(line);
 	int eq_ind = 0;
 	for(eq_ind = 0; eq_ind < len; eq_ind++)
 	{
@@ -171,6 +163,10 @@ void add_entry_to_sect(struct Section* sect, char line[])
 struct Content parse_ini_file(char path[])
 {
 	FILE* fp = fopen(path, "r");
+    if (!fp) {
+        printf("File \"%s\" not found", path);
+        exit(1);
+    }
 
 	struct Section* sects = NULL;
 	int num_sects = 0;
@@ -240,7 +236,7 @@ char* get_value(struct Content* cont, char ident[])
 		printf("Incorrect argument \"%s\"", ident);
 		exit(1);
 	}
-	int ident_len = get_length(ident);
+	int ident_len = strlen(ident);
 	bool correct_sect = false;
 
 
@@ -249,7 +245,7 @@ char* get_value(struct Content* cont, char ident[])
 	for(int i = 0; i < num_sects; i++)
 	{
 		sect_name = cont->sects[i].name;
-		if(get_length(sect_name) != dot_ind)
+		if(strlen(sect_name) != dot_ind)
 			continue;
 		
 		correct_sect = true;
@@ -282,7 +278,7 @@ char* get_value(struct Content* cont, char ident[])
 	for(int i = 0; i < num_entries; i++)
 	{
 		key = cont->sects[sect_ind].entries[i].key;
-		if(get_length(key) != (ident_len - dot_ind - 1))
+		if(strlen(key) != (ident_len - dot_ind - 1))
 			continue;
 
 		correct_key = true;
@@ -316,7 +312,7 @@ char* get_value(struct Content* cont, char ident[])
 // Return "true" if string represents integer, "false" otherwise
 bool is_number(char s[])
 {
-	int len = get_length(s);
+	int len = strlen(s);
 	if (len < 1)
 		return false;
 
@@ -337,7 +333,7 @@ bool is_number(char s[])
 // Converts string to int and returns the int value
 int str_to_int(char s[])
 {
-	int len = get_length(s);
+	int len = strlen(s);
 	int i = 0;
 	bool negative = false;
 	if(s[0] == '-')
@@ -377,7 +373,7 @@ char* get_substring(char s[], int start, int end)
 
 void run_expression(struct Content* cont, char expr[])
 {
-	int len = get_length(expr);
+	int len = strlen(expr);
 	char oper = '\0';
 	int oper_ind = -1;
 	for(int i = 0; i < len; i++)
