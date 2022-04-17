@@ -190,7 +190,7 @@ struct Content parse_ini_file(char path[])
 		}
 		else if (line_t == ERROR)
 		{
-			printf("Incorrect identifier \"%s\"\n", line);
+			printf("Incorrect identifier: \"%s\"\n", line);
 			free(line);
 
 			struct Content content;
