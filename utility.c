@@ -121,7 +121,7 @@ void add_entry_to_sect(struct Section* sect, char line[])
 	// Finding position of '=' in line
 	int len = strlen(line);
 	int eq_ind = 0;
-	for(eq_ind = 0; eq_ind < len; eq_ind++)
+	for (eq_ind = 0; eq_ind < len; eq_ind++)
 	{
 		if (line[eq_ind] == '=')
 			break;
@@ -129,11 +129,11 @@ void add_entry_to_sect(struct Section* sect, char line[])
 
 
 	char* key = (char*)malloc(sizeof(char) * (eq_ind));
-	char * val = (char*)malloc(sizeof(char) * (len - eq_ind-1));
+	char* val = (char*)malloc(sizeof(char) * (len - eq_ind-1));
 	
 	// Copying part of line into key
 	int curr_ind = 0;
-	for(; curr_ind < eq_ind-1; curr_ind++)
+	for (; curr_ind < eq_ind-1; curr_ind++)
 	{
 		key[curr_ind] = line[curr_ind];
 	}
@@ -142,7 +142,7 @@ void add_entry_to_sect(struct Section* sect, char line[])
 	// Copyting part of line into val
 	curr_ind = 0;
 	int i = eq_ind + 2;
-	for(; i < len; i++)
+	for (; i < len; i++)
 	{
 		val[curr_ind] = line[i];
 		curr_ind++;
@@ -229,42 +229,42 @@ int find_dot(char ident[])
 // Return the value for the given "section.key" in given Content
 char* get_value(struct Content* cont, char ident[])
 {
-	int num_sects = cont->num_sects;
+	const int num_sects = cont->num_sects;
 	int dot_ind = find_dot(ident);
-	if(dot_ind == -1)
+	if (dot_ind == -1)
 	{
 		printf("Incorrect argument \"%s\"", ident);
 		exit(1);
 	}
-	int ident_len = strlen(ident);
-	bool correct_sect = false;
+	const int ident_len = strlen(ident);
+	bool is_section_correct = false;
 
 
 	int sect_ind = -1;
 	char* sect_name = NULL;
-	for(int i = 0; i < num_sects; i++)
+	for (int i = 0; i < num_sects; i++)
 	{
 		sect_name = cont->sects[i].name;
 		if(strlen(sect_name) != dot_ind)
 			continue;
 		
-		correct_sect = true;
-		for(int j = 0; j < dot_ind; j++)
+		is_section_correct = true;
+		for (int j = 0; j < dot_ind; j++)
 		{
-			if(ident[j] != sect_name[j])
+			if (ident[j] != sect_name[j])
 			{
-				correct_sect = false;
+				is_section_correct = false;
 				break;
 			}
 		}
 
-		if(correct_sect)
+		if (is_section_correct)
 		{
 			sect_ind = i;
 			break;
 		}
 	}
-	if(!correct_sect)
+	if (!is_section_correct)
 	{
 		printf("Failed to find the section in %s\n", ident);
 		return NULL;
@@ -330,31 +330,6 @@ bool is_number(char s[])
 	return true;
 }
 
-// Converts string to int and returns the int value
-int str_to_int(char s[])
-{
-	int len = strlen(s);
-	int i = 0;
-	bool negative = false;
-	if(s[0] == '-')
-	{
-		negative = true;
-		i = 1;
-	}
-	
-	int num = 0;
-	for(; i < len; i++)
-	{
-		int digit = s[i] - '0';
-		num = 10 * num + digit;
-	}
-	
-	if(negative)
-		num *= -1;
-
-	return num;
-}
-
 // Returns pointer to new string, which is a substring [start, end) of given
 // ALLOCATES MEMORY
 char* get_substring(char s[], int start, int end)
@@ -406,16 +381,16 @@ void run_expression(struct Content* cont, char expr[])
 	bool first_int = is_number(val1);
 	bool second_int = is_number(val2);
 	
-	if(first_int != second_int)
+	if (first_int != second_int)
 	{
 		printf("Operands of different type. \"%s\" is invalid\n", expr);
 		return;
 	}
 
-	if(first_int)
+	if (first_int)
 	{
-		int num1 = str_to_int(val1);
-		int num2 = str_to_int(val2);
+		int num1 = atoi(val1);
+		int num2 = atoi(val2);
 		int res;
 		switch(oper)
 		{
@@ -440,7 +415,7 @@ void run_expression(struct Content* cont, char expr[])
 	}
 	else
 	{
-		if(oper != '+')
+		if (oper != '+')
 		{
 			printf("Invalid or unknown operator '%c' for strings\n", oper);
 		}
