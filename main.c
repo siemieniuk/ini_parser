@@ -21,8 +21,10 @@ int main(int argc, char *argv[])
     else
     {
         char* val = get_value(&cont, argv[2]);
-        if (val == NULL)
+        if (val == NULL) {
+            clear_content(&cont);
             exit(1);
+        }
         printf("%s\n", val);
     }
     clear_content(&cont);
