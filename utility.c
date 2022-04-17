@@ -269,7 +269,7 @@ char* get_value(struct Content* cont, char ident[])
 	for (int i = 0; i < num_sects; i++)
 	{
 		sect_name = cont->sects[i].name;
-		if (strlen(sect_name) != dot_ind)
+		if (strlen(sect_name) != (long unsigned int)dot_ind)
 			continue;
 		
 		is_section_correct = true;
@@ -304,7 +304,7 @@ char* get_value(struct Content* cont, char ident[])
 	for (int i = 0; i < num_entries; i++)
 	{
 		key = cont->sects[sect_ind].entries[i].key;
-		if (strlen(key) != (ident_len - dot_ind - 1))
+		if (strlen(key) != (long unsigned int)(ident_len - dot_ind - 1))
 			continue;
 
 		correct_key = true;
@@ -378,10 +378,10 @@ char* get_substring(char s[], int start, int end)
 
 void run_expression(struct Content* cont, char expr[])
 {
-	int len = strlen(expr);
+	const int expr_len = strlen(expr);
 	char oper = '\0';
 	int oper_ind = -1;
-	for (int i = 0; i < len; i++)
+	for (int i = 0; i < expr_len; i++)
 	{
 		if (expr[i] == ' ')
 		{
@@ -397,7 +397,7 @@ void run_expression(struct Content* cont, char expr[])
 	}
 
 	char* ident1 = get_substring(expr, 0, oper_ind-1);
-	char* ident2 = get_substring(expr, oper_ind + 2, len);
+	char* ident2 = get_substring(expr, oper_ind + 2, expr_len);
 
 	char* val1 = get_value(cont, ident1);
 	char* val2 = get_value(cont, ident2);
@@ -419,9 +419,9 @@ void run_expression(struct Content* cont, char expr[])
 
 	if (first_int)
 	{
-		int num1 = atoi(val1);
-		int num2 = atoi(val2);
-		int res;
+		long num1 = atoi(val1);
+		long num2 = atoi(val2);
+		long res;
 		switch(oper)
 		{
 		case '+':
@@ -441,7 +441,7 @@ void run_expression(struct Content* cont, char expr[])
 			return;
 			break;
 		}
-		printf("%d\n", res);
+		printf("%ld\n", res);
 	}
 	else
 	{
