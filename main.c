@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     
     struct Content cont = parse_ini_file(argv[1]);
 
-    if(check_equal_str(argv[2], "expression"))
+    if (strcmp(argv[2], "expression") == 0)
     {
         run_expression(&cont, argv[3]);
     }

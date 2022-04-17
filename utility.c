@@ -359,22 +359,6 @@ int str_to_int(char s[])
 	return num;
 }
 
-// Return "true" if two given strings are equal, "false" otherwise
-bool check_equal_str(char s1[], char s2[])
-{
-	int len1 = get_length(s1);
-	int len2 = get_length(s2);
-	if (len1 != len2)
-		return false;
-	
-	for(int i = 0; i < len1; i++)
-	{
-		if(s1[i] != s2[i])
-			return false;
-	}
-	return true;
-}
-
 // Returns pointer to new string, which is a substring [start, end) of given
 // ALLOCATES MEMORY
 char* get_substring(char s[], int start, int end)
