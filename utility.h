@@ -41,4 +41,7 @@ bool check_equal_str(char s1[], char s2[]);
 void run_expression(struct Content* cont, char expr[]);
 void clear_content(struct Content* cont);
 
+char* get_key_name(char ident[]);
+char* get_section_name(char ident[]);
+
 #endif

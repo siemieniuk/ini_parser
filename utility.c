@@ -226,9 +226,35 @@ int find_dot(char ident[])
 	return i;
 }
 
+char* get_section_name(char ident[]) {
+	const int size = find_dot(ident);
+	char* res = malloc(sizeof(char)*(size+1));
+	int i = 0;
+	while (ident[i] != '.') {
+		res[i] = ident[i];
+		i++;
+	}
+	res[size] = '\0';
+	return res;
+}
+
+char* get_key_name(char ident[]) {
+	const int dot_pos = find_dot(ident)+1;
+	const int size = strlen(ident)-dot_pos;
+	char* res = malloc(sizeof(char)*(size+1));
+	int i = 0;
+	while (ident[dot_pos+i] != '\0') {
+		res[i] = ident[dot_pos+i];
+		i++;
+	}
+	res[size] = '\0';
+	return res;
+}
+
 // Return the value for the given "section.key" in given Content
 char* get_value(struct Content* cont, char ident[])
 {
+	printf("%s\n", ident);
 	const int num_sects = cont->num_sects;
 	int dot_ind = find_dot(ident);
 	if (dot_ind == -1)
@@ -245,7 +271,7 @@ char* get_value(struct Content* cont, char ident[])
 	for (int i = 0; i < num_sects; i++)
 	{
 		sect_name = cont->sects[i].name;
-		if(strlen(sect_name) != dot_ind)
+		if (strlen(sect_name) != dot_ind)
 			continue;
 		
 		is_section_correct = true;
@@ -266,7 +292,9 @@ char* get_value(struct Content* cont, char ident[])
 	}
 	if (!is_section_correct)
 	{
-		printf("Failed to find the section in %s\n", ident);
+		char* section_name = get_section_name(ident);
+		printf("Failed to find section [%s]\n", section_name);
+		free(section_name);
 		return NULL;
 	}
 
@@ -275,14 +303,14 @@ char* get_value(struct Content* cont, char ident[])
 	bool correct_key = false;
 	int entry_ind = -1;
 	char* key = NULL;
-	for(int i = 0; i < num_entries; i++)
+	for (int i = 0; i < num_entries; i++)
 	{
 		key = cont->sects[sect_ind].entries[i].key;
-		if(strlen(key) != (ident_len - dot_ind - 1))
+		if (strlen(key) != (ident_len - dot_ind - 1))
 			continue;
 
 		correct_key = true;
-		for(int j = dot_ind + 1; j < ident_len; j++)
+		for (int j = dot_ind + 1; j < ident_len; j++)
 		{
 			if(ident[j] != key[j - dot_ind - 1])
 			{
@@ -291,15 +319,19 @@ char* get_value(struct Content* cont, char ident[])
 			}
 		}
 
-		if(correct_key)
+		if (correct_key)
 		{
 			entry_ind = i;
 			break;
 		}
 	}
-	if(!correct_key)
+	if (!correct_key)
 	{
-		printf("Failed to find the key in given section in \"%s\"\n", ident);
+		char* section_name = get_section_name(ident);
+		char* key_name = get_key_name(ident);
+		printf("Failed to find key \"%s\" in section [%s]\n", key_name, section_name);
+		free(section_name);
+		free(key_name);
 		return NULL;
 	}
 

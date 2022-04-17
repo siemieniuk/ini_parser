@@ -26,6 +26,5 @@ int main(int argc, char *argv[])
         printf("%s\n", val);
     }
     clear_content(&cont);
-
     return 0;
 }
